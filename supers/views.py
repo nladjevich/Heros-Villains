@@ -14,11 +14,22 @@ def supers_list(request):
 
     if request.method == 'GET':
         super = Supers.objects.all()
-        super_type = request.query_params.get('supertype')
-        if super_type:
-            super = super.filter(super_type__type=super_type)
+        super_type1 = request.query_params.get('supertype')
+        super_hero = Supers.objects.filter(super_type=1).values()
+        super_villain = Supers.objects.filter(super_type=2).values()
+        hero_serializer = SupersSerializer(super_hero, many=True)
+        villain_serializer = SupersSerializer(super_villain, many=True)
+
+        custom_dict = {
+            'Heroes': hero_serializer.data ,
+            'Villains': villain_serializer.data ,
+        }
+
+        if super_type1:
+            super = super.filter(super_type__type=super_type1)
+            
         serializer = SupersSerializer(super, many=True)
-        return Response(serializer.data)
+        return Response(custom_dict)
 
     elif request.method == 'POST':
         serializer = SupersSerializer(data=request.data)
